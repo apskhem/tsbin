@@ -1,0 +1,766 @@
+// special syntax included for a local parser
+// enum: // (matcher)
+// message & oneof: // (matcher) | (matcher: value)
+
+syntax = "proto3";
+
+package parser;
+
+enum VariableDeclarationKind {
+  VAR = 0; // (var)
+  LET = 1; // (let)
+  CONST = 2; // (const)
+}
+
+enum PropertyKind {
+  INIT = 0; // (init)
+}
+
+enum Operator {
+  PLUS = 0; // (+) note: it can be addition and unary plus
+  ADDITIONAL_ASSIGNMENT = 1; // (+=)
+  ASSIGNMENT = 2; // (=)
+  BITWISE_AND = 3; // (&)
+  BITWISE_AND_ASSIGNMENT = 4; // (&=)
+  BITWISE_NOT = 5; // (~)
+  BITWISE_OR = 6; // (|)
+  BITWISE_OR_ASSIGNMENT = 7; // (|=)
+  BITWISE_XOR = 8; // (^)
+  BITWISE_XOR_ASSIGNMENT = 9; // (^=)
+  COMMA_OPERATOR = 10; // (,)
+  DECREMENT = 11; // (--)
+  DELETE = 12; // (delete)
+  DIVISION = 13; // (/)
+  DIVISION_ASSIGNMENT = 14; // (/=)
+  EQUALITY = 15; // (==)
+  EXPONENTATION = 16; // (**)
+  EXPONENTATION_ASSIGNMENT = 17; // (**=)
+  GREATER_THAN = 18; // (>)
+  GREATER_THEN_OR_EQUAL = 19; // (>=)
+  IN = 20; // (in)
+  INCREMENT = 21; // (++)
+  INEUQLITY = 22; // (!=)
+  INSTANCEOF = 23; // (instanceof)
+  LEFT_SHIFT = 24; // (<<)
+  LEFT_SHIFT_ASSIGNMENT = 25; // (<<=)
+  LESS_THAN = 26; // (<)
+  LESS_THAN_OR_EQUAL = 27; // (<=)
+  LOGICAL_AND = 28; // (&&)
+  LOGICAL_AND_ASSIGNMENT = 29; // (&&=)
+  LOGICAL_NOT = 30; // (!)
+  LOGICAL_OR = 31; // (||)
+  LOGICAL_OR_ASSIGNMENT = 32; // (||=)
+  MULTIPLICATION = 33; // (*)
+  MULTIPLICATION_ASSIGNMENT = 34; // (*=)
+  NULLISH_COALESCING = 35; // (??)
+  NULLISH_COALESCING_ASSIGNMENT = 36; // (??=)
+  REMAINDER = 37; // (%)
+  REMAINDER_ASSIGNMENT = 38; // (%=)
+  RIGHT_SHIFT = 39; // (>>)
+  RIGHT_SHIFT_ASSIGNMENT = 40; // (>>=)
+  STRICT_EQUALITY = 41; // (===)
+  STRICT_INEQUALITY = 42; // (!==)
+  MIUNS = 43; // (-) note: it can be subtraction and unary negation
+  SUBTRACTION_ASSIGNMENT = 44; // (-=)
+  TYPEOF = 45; // (typeof)
+  UNSIGNED_RIGHT_SHIFT = 46; // (>>>)
+  UNSIGNED_RIGHT_SHIFT_ASSIGNMENT = 47; // (>>>=)
+  VOID = 48; // (void)
+}
+
+enum MethodDefinitionKind {
+  METHOD = 0; // (method)
+  GET = 1; // (get)
+  SET = 2; // (set)
+  CONSTRUCTOR = 3; // (constructor)
+}
+
+message Statement {
+  oneof kind {
+    FunctionDeclarationNode function_declaration = 1;
+    LabeledStatementNode labeled_statement = 2;
+    ExpressionStatementNode expression_statement = 3;
+    ReturnStatementNode return_statement = 4;
+    IfStatementNode if_statement = 5;
+    SwitchStatementNode swich_statement = 6;
+    BreakStatementNode break_statement = 7;
+    ContinueStatementNode continue_statement = 8;
+    ForStatementNode for_statement = 9;
+    ForInStatementNode for_in_statement = 10;
+    ForOfStatementNode for_of_statement = 11;
+    WhileStatementNode while_statement = 12;
+    VariableDeclarationNode variable_declaration = 13;
+    ClassDeclarationNode class_declaration = 14;
+    BlockStatementNode block_statement = 15;
+    TryStatementNode try_statement = 16;
+    ThrowStatementNode throw_statement = 17;
+    DebuggerStatementNode debugger_statement = 18;
+    EmptyStatementNode empty_statement = 19;
+  }
+}
+
+message ValueExpression {
+  oneof kind {
+    LiteralNode literal = 1;
+    TemplateLiteralNode template_literal = 2;
+    FunctionExpressionNode function_expression = 3;
+    ArrowFunctionExpressionNode arrow_function_expression = 4;
+    CallExpressionNode call_expression = 5;
+    ChainExpressionNode chain_expression = 6;
+    UnaryExpressionNode unary_expression = 7;
+    BinaryExpressionNode binary_expresion = 8;
+    ConditionalExpressionNode conditional_expression = 9;
+    LogicalExpressionNode logical_expression = 10;
+    AssignmentExpressionNode assignment_expression = 11;
+    ArrayExpressionNode array_expression = 12;
+    ObjectExpressionNode object_expression = 13;
+    MemberExpressionNode member_expression = 14;
+    IdentifierNode identifier = 15;
+    ThisExpressionNode this_expression = 16;
+    SuperNode super = 17;
+    NewExpressionNode new_expression = 18;
+    TaggedTemplateExpressionNode tagged_template_expresion = 19;
+    UpdateExpressionNode update_expression = 20;
+    SequenceExpressionNode sequence_expression = 21;
+    AwaitExpressionNode await_expression = 22;
+    ClassExpressionNode class_expression = 23;
+    ImportExpressionNode import_expression = 24;
+    MetaPropertyNode meta_property = 25;
+  }
+}
+
+message FunctionArgument {
+  oneof kind {
+    ValueExpression expression = 1;
+    RestElementNode rest_element = 3;
+  }
+}
+
+message FunctionParam {
+  oneof kind {
+    ValueExpression expression = 1;
+    AssignmentPatternNode assignment_pattern = 2;
+    RestElementNode rest_element = 3;
+  }
+}
+
+message Assignment {
+  oneof kind {
+    ValueExpression expression = 1;
+    ArrayPatternNode array_pattern = 2;
+    ObjectPatternNode object_pattern = 3;
+  }
+}
+
+// misc
+message ProgramNode {
+  message Body {
+    oneof kind {
+      Statement statement = 1;
+      ExportNamedDeclarationNode export_named = 2;
+      ExportAllDeclarationNode export_all = 3;
+      ImportDeclarationNode import = 4;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Body body = 3;
+}
+
+message ClassBodyNode {
+  message Body {
+    oneof kind {
+      PropertyDefinitionNode property_definition = 1;
+      MethodDefinitionNode method_definition = 2;
+      StaticBlockNode static_block = 3;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Body body = 3;
+}
+
+message SuperNode {
+  uint32 start = 1;
+  uint32 end = 2;
+}
+
+message PrivateIdentifierNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  string name = 4;
+}
+
+message ExportSpecifierNode {
+  message Exported {
+    oneof kind {
+      IdentifierNode identifier = 1;
+      LiteralNode literal = 2;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  IdentifierNode local = 3;
+  Exported exported = 4;
+}
+
+message ImportNamespaceSpecifierNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  IdentifierNode local = 3;
+}
+
+message ImportSpecifierNode {
+  message Imported {
+    oneof kind {
+      IdentifierNode identifier = 1;
+      LiteralNode literal = 2;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  Imported imported = 3;
+  LiteralNode source = 4;
+}
+
+message StaticBlockNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Statement body = 3;
+}
+
+message MethodDefinitionNode {
+  message Key {
+    oneof kind {
+      ValueExpression expression = 1;
+      PrivateIdentifierNode private_identifer = 2;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  bool static = 3;
+  bool computed = 4;
+  MethodDefinitionKind kind = 5;
+  ValueExpression value = 6;
+}
+
+message PropertyDefinitionNode {
+  message Key {
+    oneof kind {
+      ValueExpression expression = 1;
+      PrivateIdentifierNode private_identifer = 2;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  bool static = 3;
+  bool computed = 4;
+  Key key = 5;
+  optional ValueExpression value = 6;
+}
+
+message CatchClauseNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  IdentifierNode param = 3;
+  BlockStatementNode body = 4;
+}
+
+// declarations
+message FunctionDeclarationNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  optional IdentifierNode id = 3;
+  bool expression = 4;
+  bool generator = 5;
+  bool async = 6;
+  repeated FunctionParam params = 7;
+  BlockStatementNode body = 8;
+}
+
+message VariableDeclarationNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated VariableDeclaratorNode declarations = 3;
+  VariableDeclarationKind kind = 4;
+}
+
+message VariableDeclaratorNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  oneof id {
+    IdentifierNode identifier = 3;
+    ArrayPatternNode array_pattern = 4;
+    ObjectPatternNode object_pattern = 5;
+  }
+  optional ValueExpression init = 6;
+}
+
+message ClassDeclarationNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  optional IdentifierNode id = 3;
+  optional ValueExpression super_class = 4;
+  ClassBodyNode body = 5;
+}
+
+message ExportNamedDeclarationNode {
+  message Declaration {
+    oneof kind {
+      VariableDeclarationNode variable = 1;
+      FunctionDeclarationNode function = 2;
+      ClassDeclarationNode class = 3;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  Declaration declaration = 3;
+  repeated ExportSpecifierNode specifier = 4;
+  optional string source = 5;
+}
+
+message ExportDefaultDeclarationNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression declaration = 4;
+}
+
+message ExportAllDeclarationNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  optional IdentifierNode exported = 3;
+  LiteralNode source = 4;
+}
+
+message ImportDeclarationNode {
+  message Specifier {
+    oneof kind {
+      ImportSpecifierNode specifer = 1;
+      ImportNamespaceSpecifierNode namespace_specifer = 2;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Specifier specifiers = 3;
+  LiteralNode source = 4;
+}
+
+// identifier
+message IdentifierNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  string name = 3;
+}
+
+// elements
+message PropertyNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  bool method = 3;
+  bool shorthand = 4;
+  bool computed = 5;
+  ValueExpression key = 6;
+  oneof value {
+    AssignmentPatternNode assignment_value = 7;
+    ValueExpression expression_value = 8;
+  }
+  PropertyKind kind = 9;
+}
+
+message RestElementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  oneof argument {
+    IdentifierNode identifier = 3;
+    ArrayPatternNode array_pattern = 4;
+    ObjectPatternNode object_pattern = 5;
+  }
+}
+
+message SpreadElementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression argument = 3;
+}
+
+message TemplateElementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  string value_raw = 3; // (props["value"]["raw"])
+  string value_cooked = 4; // (props["value"]["cooked"])
+  bool tail = 5;
+}
+
+// statements
+message LabeledStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  Statement body = 3;
+  IdentifierNode label = 4;
+}
+
+message BlockStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Statement body = 3;
+}
+
+message ExpressionStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression expression = 3;
+}
+
+message ReturnStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  optional ValueExpression argument = 3;
+}
+
+message IfStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression test = 3;
+  Statement consequent = 4;
+  optional Statement alternate = 5;
+}
+
+message SwitchStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression discriminant = 3;
+  repeated SwitchCaseNode cases = 4;
+}
+
+message SwitchCaseNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Statement consequent = 3;
+  optional ValueExpression test = 4;
+}
+
+message BreakStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  optional string label = 3;
+}
+
+message ContinueStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  optional string label = 3;
+}
+
+message ForStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  VariableDeclarationNode init = 3;
+  ValueExpression test = 4;
+  ValueExpression update = 5;
+  Statement body = 6;
+}
+
+message ForInStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  VariableDeclarationNode left = 3;
+  ValueExpression right = 4;
+  Statement body = 5;
+}
+
+message ForOfStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  bool await = 3;
+  VariableDeclarationNode left = 4;
+  ValueExpression right = 5;
+  Statement body = 6;
+}
+
+message WhileStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression test = 3;
+  Statement body = 4;
+}
+
+message TryStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  BlockStatementNode block = 3;
+  optional CatchClauseNode handler = 4;
+  optional BlockStatementNode finalizer = 5;
+}
+
+message ThrowStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression argument = 3;
+}
+
+message DebuggerStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+}
+
+message EmptyStatementNode {
+  uint32 start = 1;
+  uint32 end = 2;
+}
+
+// expressions
+message LiteralNode {
+  message RegEx {
+    string pattern = 1;
+    string flags = 2;
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  oneof value {
+    string string_value = 3; // ("string": props["value"])
+    double number_value = 4; // ("number": props["value"])
+    bool boolean_value = 5; // ("boolean": props["value"])
+    bool null_value = 6; // ("null": true)
+    bool empty_object_value = 7; // ("object": true)
+    bool bigint_value = 8; // ("bigint": true)
+  }
+  string raw = 9;
+  optional string bigint = 10;
+  optional RegEx regex = 11;
+}
+
+message TemplateLiteralNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated ValueExpression expressions = 3;
+  repeated TemplateElementNode quasis = 4;
+}
+
+message ArrayExpressionNode {
+  message Element {
+    oneof kind {
+      ValueExpression expression = 1;
+      SpreadElementNode spread = 2;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Element elements = 3;
+}
+
+message ObjectExpressionNode {
+  message Property {
+    oneof kind {
+      PropertyNode property = 1;
+      SpreadElementNode spread = 2;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Property properties = 3;
+}
+
+message CallExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression callee = 3;
+  repeated FunctionArgument arguments = 4; 
+  bool optional = 5;
+}
+
+message ChainExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression expression = 3;
+}
+
+message MemberExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression object = 3;
+  ValueExpression property = 4;
+  bool computed = 5;
+  bool optional = 6;
+}
+
+message AssignmentExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  Operator operator = 3;
+  Assignment left = 4;
+  Assignment right = 5;
+}
+
+message FunctionExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  optional IdentifierNode id = 3;
+  bool expression = 4;
+  bool generator = 5;
+  bool async = 6;
+  repeated FunctionParam params = 7;
+  BlockStatementNode body = 8;
+}
+
+message ArrowFunctionExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  optional IdentifierNode id = 3;
+  bool expression = 4;
+  bool generator = 5;
+  bool async = 6;
+  repeated FunctionParam params = 7;
+  oneof body {
+    BlockStatementNode block_body = 8;
+    ValueExpression expression_body = 9;
+  }
+}
+
+message UnaryExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  Operator operator = 3;
+  bool prefix = 4;
+  ValueExpression argument = 5;
+}
+
+message BinaryExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression left = 3;
+  Operator operator = 4;
+  ValueExpression right = 5;
+}
+
+message ConditionalExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression test = 3;
+  ValueExpression consequent = 4;
+  ValueExpression alternate = 5;
+}
+
+message LogicalExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression left = 3;
+  Operator operator = 4;
+  ValueExpression right = 5;
+}
+
+message ThisExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+}
+
+message NewExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression callee = 3;
+  repeated FunctionArgument arguments = 4;
+}
+
+message UpdateExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  Operator operator = 3;
+  bool prefix = 4;
+  ValueExpression argument = 5;
+}
+
+message TaggedTemplateExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression tag = 3;
+  TemplateLiteralNode quasi = 4;
+}
+
+message SequenceExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated ValueExpression expressions = 3;
+}
+
+message AwaitExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression argument = 3;
+}
+
+message ClassExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  optional IdentifierNode id = 3;
+  optional ValueExpression super_class = 4;
+  ClassBodyNode body = 5;
+}
+
+message ImportExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  ValueExpression source = 3;
+}
+
+message MetaPropertyNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  IdentifierNode meta = 3;
+  IdentifierNode property = 4;
+}
+
+// yield expression
+message YieldExpressionNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  bool delegate = 3;
+  ValueExpression argument = 4;
+}
+
+// patterns
+message ObjectPatternNode {
+  message Property {
+    oneof kind {
+      PropertyNode property = 1;
+      AssignmentPatternNode assignment_pattern = 2;
+      RestElementNode rest_element = 3;
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Property properties = 3;
+}
+
+message ArrayPatternNode {
+  message Element {
+    oneof kind {
+      // note: should have a special case for left assignment? identifier only.
+      ValueExpression expression = 1;
+      AssignmentPatternNode assignment_pattern = 2;
+      RestElementNode rest_element = 3;
+      bool null = 4; // ("null": true)
+    }
+  }
+
+  uint32 start = 1;
+  uint32 end = 2;
+  repeated Element elements = 3;
+}
+
+message AssignmentPatternNode {
+  uint32 start = 1;
+  uint32 end = 2;
+  Assignment left = 3;
+  Assignment right = 4;
+}
